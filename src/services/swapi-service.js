@@ -17,9 +17,9 @@ export default class SwapiService {
     return res.results.map(this._transformPerson);
   }
 
-  getPerson(id) {
-    const res = this.getResource(`/people/${id}/`);
-    return this._transformPerson(res);
+  async getPerson(id) {
+    const person = await this.getResource(`/people/${id}/`);
+    return this._transformPerson(person);
   }
 
   async getAllPlanets() {
@@ -37,52 +37,50 @@ export default class SwapiService {
     return res.results.map(this._transformStarship);
   }
 
-  getStarship(id) {
-    const res = this.getResource(`/starships/${id}/`);
-    return this._transformStarship(res);
+  async getStarship(id) {
+    const starship = await this.getResource(`/starships/${id}/`);
+    return this._transformStarship(starship);
+  }
+
+  _extractedId(item) {
+    const idRegExp = /\/([0-9]*)\/$/;
+    return item.url.match(idRegExp)[1];
   }
 
   /*
   * Transformation between json responce and app vars
    */
-  _transformPlanet(planet) {
+  _transformPlanet = (planet) => {
     return {
       id: this._extractedId(planet),
       name: planet.name,
       population: planet.population,
       rotationPeriod: planet.rotation_period,
       diameter: planet.diameter
-    }
-  }
+    };
+  };
 
-  _transformStarship(starship) {
+  _transformStarship = (starship) => {
     return {
       id: this._extractedId(starship),
       name: starship.name,
       model: starship.model,
       manufacturer: starship.manufacturer,
-      costInCredits: starship.costInCredits,
+      costInCredits: starship.cost_in_credits,
       length: starship.length,
       crew: starship.crew,
       passengers: starship.passengers,
-      cargoCapacity: starship.cargoCapacity
+      cargoCapacity: starship.cargo_capacity
     }
   }
 
-  _transformPerson(person) {
+  _transformPerson = (person) => {
     return {
       id: this._extractedId(person),
       name: person.name,
       gender: person.gender,
-      birthYear: person.birthYear,
-      eyeColor: person.eyeColor
+      birthYear: person.birth_year,
+      eyeColor: person.eye_color
     }
-  }
-
-  _extractedId(planet) {
-    const idRegExp = /\/([0-9]*)\/$/;
-    const id = planet.url.match(idRegExp)[1];
-
-    return id;
-  }
+  };
 }
